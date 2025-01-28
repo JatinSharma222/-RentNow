@@ -1,0 +1,21 @@
+# Node.js
+Backend/node_modules/
+Backend/.env
+
+# Ignore .env inside the backend/src directory
+Backend/src/.env
+
+# React (CRA defaults)
+frontend/node_modules/
+frontend/build/
+frontend/.env
+.DS_Store
+
+# Logs
+*.log
+
+# System files
+Thumbs.db
+
+# Extra
+/Updates.txt
