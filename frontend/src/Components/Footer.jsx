@@ -3,8 +3,9 @@ import React from 'react'
 
 export default function Footer(){
     return(
-        <div>
-            <h1>Footer</h1>
-        </div>
+        <footer>
+            <span className='footer-watermark'>#<span>RN</span></span>
+            <span className='footer-copywrite'>&#169; 2025 #RentNow</span>
+        </footer>
     )
 }      

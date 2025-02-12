@@ -26,6 +26,10 @@ router.get('/about', (req, res) => {
 // Protected routes
 router.get('/host', authenticate, async (req, res) => {
   try {
+    if (!req.user || !req.user.email) {
+      return res.status(401).json({ message: 'Unauthorized - No user email found' });
+    }
+
     const userEmail = req.user.email;
 
     const user = await User.findOne({ email: userEmail }).select('-password');
@@ -34,22 +38,21 @@ router.get('/host', authenticate, async (req, res) => {
       return res.status(404).json({ message: 'User not found' });
     }
 
-    // Remove the .select('_id') to get all room details
     const rooms = await Room.find({ host: userEmail });
 
     res.json({
       user,
-      hostedRooms: rooms  // Return the complete room objects instead of just IDs
+      hostedRooms: rooms  
     });
   } catch (error) {
     console.error('Error in /host route:', error);
-    res.status(500).json({ message: 'Server error' });
+    res.status(500).json({ message: 'Server error', error: error.message });
   }
 });
 
 // Rooms route (unchanged)
-router.get('/rooms', authenticate, (req, res) => {
-  res.json({ message: 'Rooms Component' });
-});
+//router.get('/rooms', authenticate, (req, res) => {
+//  res.json({ message: 'Rooms Component' });
+//});
 
 export default router;
