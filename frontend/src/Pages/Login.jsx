@@ -1,9 +1,10 @@
 import React from "react";
-import { useNavigate, Link } from "react-router-dom";
+import { useNavigate, Link, useLocation } from "react-router-dom"; // ✅ Import useLocation
 import { useAuth } from "../utils/AuthContext";
 
 export default function Login() {
   const navigate = useNavigate();
+  const location = useLocation(); // ✅ Get last attempted page before redirect
   const { login } = useAuth();
   
   const [formData, setFormData] = React.useState({
@@ -48,12 +49,14 @@ export default function Login() {
         throw new Error(data.message || "Network response was not ok");
       } else {
         setStatus({ loading: true, message: "Login successful! Redirecting..." });
-        
-        // Update auth context immediately after successful login
+
+        // ✅ Update auth context immediately after successful login
         await login(data.user);
         
+        // ✅ Redirect to the last attempted page or home if none is saved
+        const redirectPath = location.state?.from?.pathname || "/";
         setTimeout(() => {
-          navigate("/");
+          navigate(redirectPath, { replace: true });
         }, 1000);
       }
     } catch (error) {

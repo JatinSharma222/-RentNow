@@ -50,9 +50,33 @@ router.get('/host', authenticate, async (req, res) => {
   }
 });
 
-// Rooms route (unchanged)
-//router.get('/rooms', authenticate, (req, res) => {
-//  res.json({ message: 'Rooms Component' });
-//});
+router.get('/profile', authenticate, async (req, res) => {
+  try {
+    if (!req.user || !req.user.email) {
+      return res.status(401).json({ message: 'Unauthorized - No user email found' });
+    }
+
+    const userEmail = req.user.email;
+
+    // Fetch user details from the database (excluding password for security)
+    const user = await User.findOne({ email: userEmail }).select('email phone _id');
+
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    // Send the response with email, phone, and ID
+    res.json({
+      email: user.email,
+      phone: user.phone,
+      id: user._id
+    });
+
+  } catch (error) {
+    console.error('Error in /profile route:', error);
+    res.status(500).json({ message: 'Server error', error: error.message });
+  }
+});
+
 
 export default router;
