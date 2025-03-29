@@ -29,6 +29,14 @@ app.use(cors({
     credentials: true, // Allow cookies	
 }));
 
+app.use(
+  cors({
+    origin: "https://rentnowjash.netlify.app", 
+    methods: "GET,POST,PUT,DELETE",
+    credentials: true, // Allow cookies and auth headers
+  })
+);
+
 // Middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
