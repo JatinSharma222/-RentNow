@@ -1,87 +1,57 @@
-import express from "express";
-import dotenv from "dotenv";
-import cors from "cors";
-import { connectDB } from "./db/db.js";
-import authRoutes from "./Routes/authRoutes.js";
-import router from "./Routes/routes.js";
-import registerRoomRouter from './Routes/registerRoom.js';
-import getAllRoomsRouter from './Routes/getAllRooms.js';
-import getSpecificRoomRouter from './Routes/getSpecificRoom.js';
-import path from "path";
-import { fileURLToPath } from "url";
+const express = require("express");
+const mongoose = require("mongoose");
+const cors = require("cors");
+const cookieParser = require("cookie-parser");
+const dotenv = require("dotenv");
+const authRoutes = require("./routes/authRoutes");
+const roomRoutes = require("./routes/roomRoutes");
 
 dotenv.config();
 
 const app = express();
-const port = process.env.PORT || 3001;
-
-connectDB();
-
-// Set the Cross-Origin-Resource-Policy header
-app.use((req, res, next) => {
-  res.setHeader("Cross-Origin-Resource-Policy", "cross-origin");
-  next();
-});
 
 // CORS Configuration
 app.use(cors({
-    origin: 'http://localhost:3000', 
-    credentials: true, // Allow cookies	
-}));
-
-app.use(
-  cors({
-    origin: "https://rentnowjash.netlify.app", 
+    origin: ["http://localhost:3000", "https://rentnowjash.netlify.app"],
     methods: "GET,POST,PUT,DELETE",
-    credentials: true, // Allow cookies and auth headers
-  })
-);
+    credentials: true // Allow cookies and authentication headers
+}));
 
 // Middleware
 app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+app.use(cookieParser());
 
-// Get __dirname equivalent in ES modules
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-
-// Serve static files
-app.use("/images", express.static(path.join(__dirname, "images")));
+// Additional CORS Headers to Ensure Proper Handling
+app.use((req, res, next) => {
+    res.setHeader("Access-Control-Allow-Origin", "https://rentnowjash.netlify.app");
+    res.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE");
+    res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
+    res.setHeader("Access-Control-Allow-Credentials", "true");
+    next();
+});
 
 // Routes
 app.use("/auth", authRoutes);
-app.use("/", router);
-app.use(registerRoomRouter);
-app.use(getAllRoomsRouter);
-app.use(getSpecificRoomRouter);
+app.use("/rooms", roomRoutes);
+
+// MongoDB Connection
+mongoose.connect(process.env.MONGO_URI, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true
+}).then(() => {
+    console.log("MongoDB Connected");
+}).catch((err) => {
+    console.error("MongoDB Connection Error:", err);
+});
 
 // Default Route
 app.get("/", (req, res) => {
-  res.json({
-    message: "Welcome to the API",
-    status: "healthy",
-  });
+    res.send("Welcome to RentNow Backend!");
 });
 
-// Error Handlers
-app.use((req, res) => {
-  res.status(404).json({
-    message: "Route not found",
-    path: req.path,
-  });
+// Start Server
+const PORT = process.env.PORT || 5000;
+app.listen(PORT, () => {
+    console.log(`Server running on port ${PORT}`);
 });
 
-app.use((err, req, res, next) => {
-  console.error(err.stack);
-  res.status(500).json({
-    message: "Something went wrong!",
-    error: process.env.NODE_ENV === "development" ? err.message : {},
-  });
-});
-
-// Start the server
-const server = app.listen(port, () => {
-  console.log(`Server running on port ${port}`);
-});
-
-export default app;
