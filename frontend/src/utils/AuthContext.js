@@ -1,6 +1,5 @@
-const API_URL = process.env.REACT_APP_API_URL;
 import React, { createContext, useState, useContext, useEffect } from 'react';
-
+const API_URL = process.env.REACT_APP_API_URL;
 const AuthContext = createContext(null);
 
 export const AuthProvider = ({ children }) => {
