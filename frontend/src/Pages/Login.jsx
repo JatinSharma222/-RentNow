@@ -2,6 +2,7 @@ import React from "react";
 import { useNavigate, Link, useLocation } from "react-router-dom"; // ✅ Import useLocation
 import { useAuth } from "../utils/AuthContext";
 
+const API_URL = process.env.REACT_APP_API_URL;
 export default function Login() {
   const navigate = useNavigate();
   const location = useLocation(); // ✅ Get last attempted page before redirect
@@ -30,7 +31,7 @@ export default function Login() {
     setStatus({ loading: true, message: "Logging you in..." });
     
     try {
-      const response = await fetch("http://localhost:3001/auth/login", {
+      const response = await fetch(`${API_URL}/auth/login`, {
         method: "POST",
         credentials: 'include',
         headers: {

@@ -1,6 +1,7 @@
+const API_URL = process.env.REACT_APP_API_URL;
 const getSpecificRoom = async (id) => {
     try {
-      const response = await fetch(`http://localhost:3001/auth/rooms/${id}`, {
+      const response = await fetch(`${API_URL}/auth/rooms/${id}`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',

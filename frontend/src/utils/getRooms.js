@@ -1,6 +1,7 @@
+const API_URL = process.env.REACT_APP_API_URL;
 const getRooms = async () => {
   try {
-    const response = await fetch('http://localhost:3001/rooms', {
+    const response = await fetch(`${API_URL}/rooms`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',

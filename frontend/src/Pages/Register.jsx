@@ -1,6 +1,7 @@
 import React from "react";
 import { useNavigate, Link } from "react-router-dom";
 
+const API_URL = process.env.REACT_APP_API_URL;
 export default function Register() {
   const navigate = useNavigate();
   const [formData, setFormData] = React.useState({
@@ -36,7 +37,7 @@ export default function Register() {
     setStatus({ loading: true, message: "Creating your account..." });
     
     try {
-      const response = await fetch("http://localhost:3001/auth/register", {
+      const response = await fetch(`${API_URL}/auth/register`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

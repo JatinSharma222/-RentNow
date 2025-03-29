@@ -1,3 +1,4 @@
+const API_URL = process.env.REACT_APP_API_URL;
 import React, { createContext, useState, useContext, useEffect } from 'react';
 
 const AuthContext = createContext(null);
@@ -9,7 +10,7 @@ export const AuthProvider = ({ children }) => {
 
   const checkAuthStatus = async () => {
     try {
-      const response = await fetch('http://localhost:3001/auth/verify', {
+      const response = await fetch(`${API_URL}/auth/verify`, {
         credentials: 'include',
       });
       
