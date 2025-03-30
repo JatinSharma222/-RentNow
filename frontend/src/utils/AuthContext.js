@@ -1,4 +1,4 @@
-import React, { createContext, useState, useContext, useEffect, useCallback } from 'react';
+import React, { createContext, useState, useContext, useCallback } from 'react';
 const API_URL = process.env.REACT_APP_API_URL;
 const AuthContext = createContext(null);
 
