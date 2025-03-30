@@ -1,4 +1,4 @@
-import React, { createContext, useState, useContext, useEffect } from 'react';
+import React, { createContext, useState, useContext, useEffect, useCallback } from 'react';
 const API_URL = process.env.REACT_APP_API_URL;
 const AuthContext = createContext(null);
 
@@ -8,7 +8,7 @@ export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [token, setToken] = useState(localStorage.getItem('token') || null);
 
-  const checkAuthStatus = async () => {
+  const checkAuthStatus = useCallback(async () => {
     try {
       // Skip verification if no token exists
       if (!token) {
@@ -17,7 +17,7 @@ export const AuthProvider = ({ children }) => {
         setLoading(false);
         return;
       }
-
+  
       const response = await fetch(`${API_URL}/auth/verify`, {
         method: 'GET',
         headers: {
@@ -46,10 +46,6 @@ export const AuthProvider = ({ children }) => {
     } finally {
       setLoading(false);
     }
-  };
-
-  useEffect(() => {
-    checkAuthStatus();
   }, [token]);
 
   const login = async (email, password) => {

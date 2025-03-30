@@ -1,5 +1,3 @@
-import { useAuth } from './AuthContext'; 
-
 const API_URL = process.env.REACT_APP_API_URL;
 
 const getRooms = async () => {
