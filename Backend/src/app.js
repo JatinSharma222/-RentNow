@@ -23,29 +23,55 @@ const allowedOrigins = [
   'https://rentnowjash.netlify.app'
 ];
 
-// CORS Configuration with proper origin handling
+// Basic CORS configuration
 app.use(cors({
-    origin: function(origin, callback) {
-        // allow requests with no origin (like mobile apps or curl requests)
-        if(!origin) return callback(null, true);
-        if(allowedOrigins.indexOf(origin) === -1){
-            return callback(new Error('The CORS policy for this site does not allow access from the specified Origin.'), false);
-        }
-        return callback(null, true);
-    },
-    credentials: true // Allow cookies
+  origin: allowedOrigins,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
+  credentials: true,
+  maxAge: 86400 // 24 hours
 }));
 
-// Handle OPTIONS requests
-app.options('*', cors());
+// Handle OPTIONS requests explicitly
+app.options('*', (req, res) => {
+  // Get origin from request
+  const origin = req.headers.origin;
+  
+  // Check if origin is allowed
+  if (allowedOrigins.includes(origin)) {
+    // Set CORS headers
+    res.header('Access-Control-Allow-Origin', origin);
+    res.header('Access-Control-Allow-Methods', 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS');
+    res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With');
+    res.header('Access-Control-Allow-Credentials', 'true');
+    res.header('Access-Control-Max-Age', '86400'); // 24 hours
+    
+    // Respond with 200 OK
+    res.status(200).end();
+  } else {
+    // Not an allowed origin
+    res.status(403).end();
+  }
+});
 
-// Set the Cross-Origin-Resource-Policy header
+// Middleware to ensure CORS headers are set on every response
 app.use((req, res, next) => {
-  res.setHeader("Cross-Origin-Resource-Policy", "cross-origin");
+  const origin = req.headers.origin;
+  
+  if (allowedOrigins.includes(origin)) {
+    res.header('Access-Control-Allow-Origin', origin);
+    res.header('Access-Control-Allow-Methods', 'GET,HEAD,PUT,PATCH,POST,DELETE');
+    res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With');
+    res.header('Access-Control-Allow-Credentials', 'true');
+  }
+  
+  // Set the Cross-Origin-Resource-Policy header
+  res.header("Cross-Origin-Resource-Policy", "cross-origin");
+  
   next();
 });
 
-// Middleware
+// Regular middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
@@ -81,6 +107,14 @@ app.use((req, res) => {
 
 app.use((err, req, res, next) => {
   console.error(err.stack);
+  
+  // Ensure CORS headers are set even on error responses
+  const origin = req.headers.origin;
+  if (allowedOrigins.includes(origin)) {
+    res.header('Access-Control-Allow-Origin', origin);
+    res.header('Access-Control-Allow-Credentials', 'true');
+  }
+  
   res.status(500).json({
     message: "Something went wrong!",
     error: process.env.NODE_ENV === "development" ? err.message : {},
