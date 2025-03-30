@@ -17,17 +17,33 @@ const port = process.env.PORT || 3001;
 
 connectDB();
 
+// Define allowed origins
+const allowedOrigins = [
+  'http://localhost:3000',
+  'https://rentnowjash.netlify.app'
+];
+
+// CORS Configuration with proper origin handling
+app.use(cors({
+    origin: function(origin, callback) {
+        // allow requests with no origin (like mobile apps or curl requests)
+        if(!origin) return callback(null, true);
+        if(allowedOrigins.indexOf(origin) === -1){
+            return callback(new Error('The CORS policy for this site does not allow access from the specified Origin.'), false);
+        }
+        return callback(null, true);
+    },
+    credentials: true // Allow cookies
+}));
+
+// Handle OPTIONS requests
+app.options('*', cors());
+
 // Set the Cross-Origin-Resource-Policy header
 app.use((req, res, next) => {
   res.setHeader("Cross-Origin-Resource-Policy", "cross-origin");
   next();
 });
-
-// CORS Configuration
-app.use(cors({
-    origin: 'http://localhost:3000', 
-    credentials: true, // Allow cookies	
-}));
 
 // Middleware
 app.use(express.json());
