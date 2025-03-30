@@ -6,10 +6,23 @@ export const AuthProvider = ({ children }) => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [loading, setLoading] = useState(true);
   const [user, setUser] = useState(null);
+  const [token, setToken] = useState(localStorage.getItem('token') || null);
 
   const checkAuthStatus = async () => {
     try {
+      // Skip verification if no token exists
+      if (!token) {
+        setIsLoggedIn(false);
+        setUser(null);
+        setLoading(false);
+        return;
+      }
+
       const response = await fetch(`${API_URL}/auth/verify`, {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
         credentials: 'include',
       });
       
@@ -18,11 +31,16 @@ export const AuthProvider = ({ children }) => {
         setUser(data.user);
         setIsLoggedIn(true);
       } else {
+        // If token is invalid, clear it
+        localStorage.removeItem('token');
+        setToken(null);
         setIsLoggedIn(false);
         setUser(null);
       }
     } catch (error) {
       console.error('Auth verification failed:', error);
+      localStorage.removeItem('token');
+      setToken(null);
       setIsLoggedIn(false);
       setUser(null);
     } finally {
@@ -32,26 +50,62 @@ export const AuthProvider = ({ children }) => {
 
   useEffect(() => {
     checkAuthStatus();
-  }, []);
+  }, [token]);
 
-  const login = async (userData) => {
-    setUser(userData);
-    setIsLoggedIn(true);
-    await checkAuthStatus(); // Verify and update user data
+  const login = async (email, password) => {
+    try {
+      const response = await fetch(`${API_URL}/auth/login`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email, password }),
+        credentials: 'include',
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Login failed');
+      }
+
+      const data = await response.json();
+      
+      // Save token to localStorage and state
+      localStorage.setItem('token', data.token);
+      setToken(data.token);
+      setUser(data.user);
+      setIsLoggedIn(true);
+      
+      return data;
+    } catch (error) {
+      console.error('Login error:', error);
+      throw error;
+    }
   };
 
   const logout = async () => {
     try {
-      await fetch('http://localhost:3001/auth/logout', {
+      await fetch(`${API_URL}/auth/logout`, {
         method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
         credentials: 'include',
       });
     } catch (error) {
       console.error('Logout failed:', error);
     } finally {
+      // Clear token from localStorage and state
+      localStorage.removeItem('token');
+      setToken(null);
       setIsLoggedIn(false);
       setUser(null);
     }
+  };
+
+  // Helper method to get auth header for other API calls
+  const getAuthHeader = () => {
+    return token ? { 'Authorization': `Bearer ${token}` } : {};
   };
 
   return (
@@ -59,9 +113,11 @@ export const AuthProvider = ({ children }) => {
       isLoggedIn, 
       loading, 
       user,
+      token,
       login, 
       logout, 
-      checkAuthStatus 
+      checkAuthStatus,
+      getAuthHeader
     }}>
       {children}
     </AuthContext.Provider>

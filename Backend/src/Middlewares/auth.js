@@ -1,26 +1,44 @@
-// Middleware for authentication
 import jwt from 'jsonwebtoken';
+import dotenv from 'dotenv';
 import cookie from 'cookie';
 
+dotenv.config();
+
+const SECRET_KEY = process.env.JWT_SECRET;
+
 export const authenticate = (req, res, next) => {
-  const cookies = cookie.parse(req.headers.cookie || ''); // Parse cookies from the request
-
-  const token = cookies.jwt; // Get JWT from the cookie
-
-  if (!token) {
-    return res.status(401).json({ message: "No token provided" });
-  }
-
   try {
-    // Verify the JWT token
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    req.user = decoded; // Attach decoded user data to the request object
-    next(); // Allow the request to proceed to the next middleware/route handler
+    // Get token from authorization header or cookie
+    let token;
+    
+    // Check Authorization header first (for cross-domain requests)
+    const authHeader = req.headers.authorization;
+    if (authHeader && authHeader.startsWith('Bearer ')) {
+      token = authHeader.substring(7);
+    } else {
+      // Check cookies as fallback (for same-domain requests)
+      const cookies = cookie.parse(req.headers.cookie || '');
+      token = cookies.jwt;
+    }
+
+    if (!token) {
+      return res.status(401).json({ message: 'Authentication required' });
+    }
+
+    // Verify token
+    const decoded = jwt.verify(token, SECRET_KEY);
+    
+    // Add user data to request
+    req.user = {
+      userId: decoded.userId,
+      email: decoded.email
+    };
+    
+    next();
   } catch (error) {
-    console.error('Token verification error:', error);
-    res.status(401).json({ message: "Invalid or expired token" });
+    console.error('Authentication error:', error);
+    return res.status(401).json({ message: 'Invalid or expired token' });
   }
 };
 
-
-export default authenticate
+export default authenticate;
