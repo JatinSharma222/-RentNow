@@ -90,14 +90,14 @@ export default function Rooms() {
                                 <span className='room-badge'>
                                     {room.isAvailable ? "Available" : "Not Available"}
                                 </span>
-                                <img alt='room-image' src={`http://localhost:3001${room.images[0]}`} />
+                                <img alt='room-image' src={`https://rentnow-fylj.onrender.com${room.images[0]}`} />
                                 <div className='secondary-room-info'>
                                     <span>Type: {room.type}</span>
                                     <span>Price: {room.price}Rs/Per-night</span>
                                     <span>Location: {room.location}</span>
                                     <Link 
                                         className='room-detail'
-                                        to={`/rooms/${room._id}/description`}
+                                        to={`/auth/rooms/${room._id}/description`}
                                         state={{
                                             search: `?${searchParams.toString()}`,
                                             type: typeFilter

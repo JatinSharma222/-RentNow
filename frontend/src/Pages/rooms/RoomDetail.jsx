@@ -50,7 +50,7 @@ export default function RoomDetail() {
         <img
           className="room-detail-image"
           alt="room-image"
-          src={`http://localhost:3001${room.images[0]}`}
+          src={`https://rentnow-fylj.onrender.com${room.images[0]}`}
         />
         <Link className="rent-button" to="#">
           {room.isAvailable ? "Rent Room" : "Notify Me"}
