@@ -3,8 +3,8 @@ import mongoose from "mongoose";
 import cors from "cors";
 import cookieParser from "cookie-parser";
 import dotenv from "dotenv";
-import authRoutes from "./routes/authRoutes.js";
-import roomRoutes from "./routes/roomRoutes.js";
+import authRoutes from "./Routes/authRoutes.js";
+import roomRoutes from "./Routes/roomRoutes.js";
 
 dotenv.config();
 
