@@ -5,7 +5,7 @@ const getSpecificRoom = async (id) => {
     // Get token from localStorage
     const token = localStorage.getItem('token');
     
-    const response = await fetch(`${API_URL}/rooms/${id}`, {
+    const response = await fetch(`${API_URL}/auth/rooms/${id}`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
