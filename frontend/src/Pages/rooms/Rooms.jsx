@@ -97,7 +97,7 @@ export default function Rooms() {
                                     <span>Location: {room.location}</span>
                                     <Link 
                                         className='room-detail'
-                                        to={`/auth/rooms/${room._id}/description`}
+                                        to={`/rooms/${room._id}/description`}
                                         state={{
                                             search: `?${searchParams.toString()}`,
                                             type: typeFilter

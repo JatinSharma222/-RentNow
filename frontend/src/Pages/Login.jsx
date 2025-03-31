@@ -31,7 +31,7 @@ export default function Login() {
     setStatus({ loading: true, message: "Logging you in..." });
     
     try {
-      const response = await fetch(`${API_URL}/auth/login`, {
+      const response = await fetch(`${API_URL}/login`, {
         method: "POST",
         credentials: 'include',
         headers: {
