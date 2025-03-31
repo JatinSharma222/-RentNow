@@ -9,7 +9,7 @@ function isValidObjectId(id) {
 }
 
 // Route to get a specific room by ID
-router.get("/auth/rooms/:id", async (req, res) => {
+router.get("/rooms/:id", async (req, res) => {
   try {
     const { id } = req.params;
 
