@@ -2,10 +2,10 @@ const API_URL = process.env.REACT_APP_API_URL;
 
 const getSpecificRoom = async (id) => {
   try {
-    // Get token from localStorage
     const token = localStorage.getItem('token');
     
-    const response = await fetch(`${API_URL}/auth/rooms/${id}`, {
+    // Change this URL to match your backend route
+    const response = await fetch(`${API_URL}/rooms/${id}`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',

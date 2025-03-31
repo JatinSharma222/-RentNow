@@ -39,9 +39,9 @@ export default function Login() {
         },
         body: JSON.stringify(formData),
       });
-
+  
       const data = await response.json();
-
+  
       if (response.status === 404) {
         setStatus({ loading: false, message: "User not found" });
       } else if (response.status === 401) {
@@ -50,11 +50,9 @@ export default function Login() {
         throw new Error(data.message || "Network response was not ok");
       } else {
         setStatus({ loading: true, message: "Login successful! Redirecting..." });
-
-        // ✅ Update auth context immediately after successful login
-        await login(data.user);
+  
+        await login(formData.email, formData.password);
         
-        // ✅ Redirect to the last attempted page or home if none is saved
         const redirectPath = location.state?.from?.pathname || "/";
         setTimeout(() => {
           navigate(redirectPath, { replace: true });
