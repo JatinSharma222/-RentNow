@@ -7,7 +7,7 @@ export default function Profile() {
   useEffect(() => {
     const fetchProfile = async () => {
       try {
-        const response = await fetch("http://localhost:3001/profile", {
+        const response = await fetch("https://rentnow-fylj.onrender.com/profile", {
           method: "GET",
           credentials: "include", // Ensures cookies (if any) are sent
           headers: {
