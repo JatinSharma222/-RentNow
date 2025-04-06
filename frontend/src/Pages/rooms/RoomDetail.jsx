@@ -2,8 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { useParams, Outlet, NavLink } from 'react-router-dom';
 import getSpecificRoom from '../../utils/getSpecificRoom';
 
-// Default to production URL if environment variable is not set
-const API_URL = process.env.REACT_APP_API_URL || 'https://rentnow-backend.onrender.com';
+// // Default to production URL if environment variable is not set
+// const API_URL = process.env.REACT_APP_API_URL || 'https://rentnow-backend.onrender.com';
 
 export default function RoomDetail() {
   const { id } = useParams();
