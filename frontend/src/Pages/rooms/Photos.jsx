@@ -57,7 +57,7 @@ export default function Description() {
       <Slider {...settings} className="slick-slider">
         {room.images.map((image, index) => (
           <div key={index} className="slider-image-container">
-            <img src={`http://localhost:3001${image}`} alt={`Room ${index + 1}`} className="slider-image" />
+            <img src={`https://rentnow-fylj.onrender.com${image}`} alt={`Room ${index + 1}`} className="slider-image" />
           </div>
         ))}
       </Slider>
