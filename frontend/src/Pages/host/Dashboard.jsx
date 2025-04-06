@@ -1,22 +1,32 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import { useAuth } from '../../utils/AuthContext';
+
+// Default to production URL if environment variable is not set
+const API_URL = process.env.REACT_APP_API_URL || 'https://rentnow-backend.onrender.com';
 
 export default function Dashboard() {
     const [rooms, setRooms] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [user, setUser] = useState(null);
+    const { token } = useAuth();
 
     useEffect(() => {
         const fetchUserData = async () => {
             try {
-                const res = await fetch('http://localhost:3001/host', {  
+                if (!token) {
+                    throw new Error('Please login to access this page');
+                }
+
+                const res = await fetch(`${API_URL}/host`, {  
                     method: 'GET',
-                    credentials: 'include',
                     headers: {
                         'Accept': 'application/json',
                         'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
                     },
+                    credentials: 'include',
                 });
 
                 if (!res.ok) {
@@ -37,12 +47,12 @@ export default function Dashboard() {
 
                 const userData = await res.json();
                 setUser(userData.user);
-                setRooms(userData.hostedRooms);
+                setRooms(userData.hostedRooms || []);
             } catch (err) {
                 console.error('Fetch error:', err);
                 setError(err.message || 'Failed to fetch data');
                 if (err.name === 'TypeError' && err.message === 'Failed to fetch') {
-                    setError('Unable to connect to the server. Please make sure the server is running.');
+                    setError('Unable to connect to the server. Please try again later.');
                 }
             } finally {
                 setLoading(false);
@@ -50,7 +60,7 @@ export default function Dashboard() {
         };
 
         fetchUserData();
-    }, []);
+    }, [token]);
 
     const formatDate = (isoString) => {
         const date = new Date(isoString);
@@ -102,7 +112,16 @@ export default function Dashboard() {
                             className="dashboard-room"
                         >
                             <span className="dashboard-room-badge">{room.isAvailable ? "Vacant" : "Booked"}</span>
-                            <img className='dashboard-image' alt="Room" src={`http://localhost:3001${room.images[0]}`} />
+                            <img 
+                                className='dashboard-image' 
+                                alt="Room" 
+                                src={room.images && room.images[0] ? 
+                                    room.images[0].startsWith('http') ? 
+                                        room.images[0] : 
+                                        `${API_URL}${room.images[0]}` 
+                                    : 
+                                    '#'} 
+                            />
                             <h3><span>Type: </span>{room.type}</h3>
                             <h3><span>Price: </span>{room.price} Rs/Per-night</h3>
                             <h3><span>Uploaded Date: </span>{formatDate(room.createdAt)}</h3>

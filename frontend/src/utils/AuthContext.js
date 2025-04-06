@@ -1,5 +1,8 @@
-import React, { createContext, useState, useContext, useCallback } from 'react';
-const API_URL = process.env.REACT_APP_API_URL;
+import React, { createContext, useState, useContext, useCallback, useEffect } from 'react';
+
+// Default to production URL if environment variable is not set
+const API_URL = process.env.REACT_APP_API_URL || 'https://rentnow-backend.onrender.com';
+
 const AuthContext = createContext(null);
 
 export const AuthProvider = ({ children }) => {
@@ -22,6 +25,7 @@ export const AuthProvider = ({ children }) => {
         method: 'GET',
         headers: {
           'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
         },
         credentials: 'include',
       });
@@ -47,6 +51,11 @@ export const AuthProvider = ({ children }) => {
       setLoading(false);
     }
   }, [token]);
+
+  // Check auth status when component mounts
+  useEffect(() => {
+    checkAuthStatus();
+  }, [checkAuthStatus]);
 
   const login = async (email, password) => {
     try {
@@ -85,6 +94,7 @@ export const AuthProvider = ({ children }) => {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
         },
         credentials: 'include',
       });
